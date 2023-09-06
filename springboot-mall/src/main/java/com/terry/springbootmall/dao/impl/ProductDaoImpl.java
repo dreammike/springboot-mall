@@ -31,8 +31,9 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map=new HashMap<>();
 
+        //查詢條件
         if(productQueryParams.getCategory() !=null){
-            //AND須預留空白建材不會讓SQL語具連在一起
+            //AND須預留空白健才不會讓SQL語具連在一起
             sql=sql +" AND category =:category";//select sql from product where 1=1 AND category=:category
             map.put("category", productQueryParams.getCategory().name());//使用NAME方法，將CATEGORY轉換成字串放入category裡面，因為使用enum類型
         }
@@ -43,8 +44,13 @@ public class ProductDaoImpl implements ProductDao {
 
         }
 
-        sql=sql+" ORDER BY "+productQueryParams.getOrderBy()+" "+productQueryParams.getSort();
+        //排序
+        sql=sql + " ORDER BY "+productQueryParams.getOrderBy()+" "+productQueryParams.getSort();
 
+        //分頁
+        sql=sql+" LIMIT :limit OFFSET :offset";
+        map.put("limit",productQueryParams.getLimit());
+        map.put("offset",productQueryParams.getOffset());
 
         List<Product> productList =namedParameterJdbcTemplate.query(sql,map, new ProductRowMapper());
 
